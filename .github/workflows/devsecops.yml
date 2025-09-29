@@ -1,1 +1,33 @@
+name: Simple DevSecOps Pipeline (React)
 
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+
+jobs:
+  build-test-scan:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    # 1. Set up Node.js
+    - name: Use Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '20'
+
+    # 2. Install dependencies
+    - run: npm install
+
+    # 3. Run tests
+    - run: npm test -- --watchAll=false
+
+    # 4. Security audit of dependencies
+    - name: Run npm audit
+      run: npm audit --audit-level=high || true
+
+    # 5. Dependency review (built-in GitHub security check)
+    - name: Dependency Review
+      uses: actions/dependency-review-action@v4
